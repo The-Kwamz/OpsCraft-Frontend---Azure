@@ -1,7 +1,7 @@
 import type { Job } from '../types'
 
 // ---- TEMPORARY MOCK IMPLEMENTATION ----
-// i will replace these with real HTTP calls later.
+// I will replace these with real HTTP calls later.
 
 let MOCK_JOBS: Job[] = [
   {

@@ -5,7 +5,7 @@ export type JobStatus =
 
 export interface Job {
   id: string
-  companyId: string            // for now we'll use "default"
+  companyId: string            // for now l'll use "default"
   title: string
   description?: string
   customerName?: string
@@ -14,6 +14,6 @@ export interface Job {
   assignedTo?: string
   currentStatus: JobStatus
   priority?: 'low' | 'normal' | 'high'
-  createdAt: string            // ISO timestamps
+  createdAt: string            // These are ISO timestamps
   updatedAt: string
 }
