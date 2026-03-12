@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showCreateForm, setShowCreateForm] = useState(false)
 
   useEffect(() => {
     ;(async () => {
@@ -43,6 +44,7 @@ export default function Dashboard() {
       setCustomerName('')
       setAddress('')
       setNotes('')
+      setShowCreateForm(false)
     } catch (e: any) {
       setError(e.message || 'Failed to create job')
     } finally {
@@ -57,35 +59,45 @@ export default function Dashboard() {
       {error && <div style={{ color: 'crimson', marginBottom: 8 }}>{error}</div>}
 
       <section style={{ margin: '12px 0', padding: 12, border: '1px solid #ddd' }}>
-        <h3 style={{ marginTop: 0 }}>Create Job</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ marginTop: 0, marginBottom: 0 }}>Jobs</h3>
+          <button type="button" onClick={() => setShowCreateForm(prev => !prev)}>
+            {showCreateForm ? 'Close form' : 'Add Job'}
+          </button>
+        </div>
 
-        <form onSubmit={createJob} style={{ display: 'grid', gap: 8, maxWidth: 460 }}>
-          <input
-            placeholder="Service type *"
-            required
-            value={serviceType}
-            onChange={e => setServiceType(e.target.value)}
-          />
-          <input
-            placeholder="Customer name *"
-            required
-            value={customerName}
-            onChange={e => setCustomerName(e.target.value)}
-          />
-          <input
-            placeholder="Address *"
-            required
-            value={address}
-            onChange={e => setAddress(e.target.value)}
-          />
-          <input
-            placeholder="Notes *"
-            required
-            value={notes}
-            onChange={e => setNotes(e.target.value)}
-          />
-          <button disabled={saving}>{saving ? 'Creating…' : 'Create job'}</button>
-        </form>
+        {showCreateForm && (
+          <form
+            onSubmit={createJob}
+            style={{ display: 'grid', gap: 8, maxWidth: 460, marginTop: 16 }}
+          >
+            <input
+              placeholder="Service type *"
+              required
+              value={serviceType}
+              onChange={e => setServiceType(e.target.value)}
+            />
+            <input
+              placeholder="Customer name *"
+              required
+              value={customerName}
+              onChange={e => setCustomerName(e.target.value)}
+            />
+            <input
+              placeholder="Address *"
+              required
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+            />
+            <input
+              placeholder="Notes *"
+              required
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+            />
+            <button disabled={saving}>{saving ? 'Creating…' : 'Create job'}</button>
+          </form>
+        )}
       </section>
 
       <section style={{ marginTop: 16 }}>
