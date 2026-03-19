@@ -1,12 +1,44 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { Api } from '../lib/api'
 
 export default function CreateJob() {
+  const navigate = useNavigate()
+
   const [customer, setCustomer] = useState('')
   const [contact, setContact] = useState('')
   const [location, setLocation] = useState('')
   const [jobType, setJobType] = useState('')
   const [description, setDescription] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+
+    if (!customer || !contact || !location || !jobType || !description.trim()) {
+      setError('Please complete all required fields.')
+      return
+    }
+
+    setSaving(true)
+
+    try {
+      await Api.createJob({
+        customerName: customer,
+        serviceType: jobType,
+        address: location,
+        notes: `Contact: ${contact}\n\nDescription: ${description.trim()}`,
+      })
+
+      navigate('/')
+    } catch (e: any) {
+      setError(e.message || 'Failed to create job')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="create-job-page">
@@ -17,16 +49,19 @@ export default function CreateJob() {
       </div>
 
       <div className="create-job-layout">
-        <div className="create-job-form-column">
+        <form className="create-job-form-column" onSubmit={handleSubmit}>
+          {error && <div className="error">{error}</div>}
+
           <div className="create-job-field">
             <select
               value={customer}
               onChange={(e) => setCustomer(e.target.value)}
               className="create-job-select"
+              required
             >
               <option value="">Select Customer *</option>
-              <option value="vodacom">Vodacom</option>
-              <option value="makhoba">Makhoba Professional Services</option>
+              <option value="Vodacom">Vodacom</option>
+              <option value="Makhoba Professional Services">Makhoba Professional Services</option>
             </select>
           </div>
 
@@ -35,10 +70,11 @@ export default function CreateJob() {
               value={contact}
               onChange={(e) => setContact(e.target.value)}
               className="create-job-select"
+              required
             >
               <option value="">Select Contact *</option>
-              <option value="kwame">Kwame Yinkah</option>
-              <option value="admin">Admin Contact</option>
+              <option value="Kwame Yinkah">Kwame Yinkah</option>
+              <option value="Admin Contact">Admin Contact</option>
             </select>
           </div>
 
@@ -47,10 +83,11 @@ export default function CreateJob() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               className="create-job-select"
+              required
             >
-              <option value="">Select Location</option>
-              <option value="johannesburg">Johannesburg</option>
-              <option value="pretoria">Pretoria</option>
+              <option value="">Select Location *</option>
+              <option value="Johannesburg">Johannesburg</option>
+              <option value="Pretoria">Pretoria</option>
             </select>
           </div>
 
@@ -60,11 +97,12 @@ export default function CreateJob() {
               value={jobType}
               onChange={(e) => setJobType(e.target.value)}
               className="create-job-select"
+              required
             >
               <option value="">Select job type</option>
-              <option value="callout">Call Out</option>
-              <option value="installation">Installation</option>
-              <option value="maintenance">Maintenance</option>
+              <option value="Call Out">Call Out</option>
+              <option value="Installation">Installation</option>
+              <option value="Maintenance">Maintenance</option>
             </select>
           </div>
 
@@ -74,13 +112,14 @@ export default function CreateJob() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="create-job-textarea"
+              required
             />
           </div>
 
-          <button type="button" className="create-job-submit">
-            Create Job
+          <button type="submit" className="create-job-submit" disabled={saving}>
+            {saving ? 'Creating Job...' : 'Create Job'}
           </button>
-        </div>
+        </form>
 
         <div className="create-job-history-column">
           <div className="create-job-history-illustration">🗂️</div>

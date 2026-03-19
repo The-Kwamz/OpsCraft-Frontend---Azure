@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 
-type JobsTab = 'jobs' | 'recurring' | 'projects'
+type JobsTab = 'jobs' | 'projects'
 
 type MockJob = {
   id: string
@@ -30,7 +31,7 @@ const mockJobs: MockJob[] = [
     status: 'Booked',
     inStatus: 0,
     overall: 0,
-    updatedBy: 'kwameyin',
+    updatedBy: 'kwameyinkah@gmail.com',
     updatedDate: '12 Mar 2026',
     van: '',
   },
@@ -77,18 +78,9 @@ export default function Jobs() {
             />
           </div>
 
-          <button type="button" className="jobs-icon-button" aria-label="Settings">
-            ⚙
-          </button>
-
-          <button type="button" className="jobs-icon-button" aria-label="Help">
-            ?
-          </button>
-
           <button type="button" className="jobs-user-button" aria-label="User menu">
-            <span className="jobs-avatar">KY</span>
-            <span className="jobs-user-name">Kwame</span>
-            <span className="jobs-user-caret">▾</span>
+            <span className="jobs-avatar">SJ</span>
+            <span className="jobs-user-name">Search Job</span>
           </button>
         </div>
       </div>
@@ -100,14 +92,6 @@ export default function Jobs() {
           onClick={() => setActiveTab('jobs')}
         >
           Jobs
-        </button>
-
-        <button
-          type="button"
-          className={activeTab === 'recurring' ? 'jobs-tab active' : 'jobs-tab'}
-          onClick={() => setActiveTab('recurring')}
-        >
-          Recurring Jobs
         </button>
 
         <button
@@ -190,9 +174,9 @@ export default function Jobs() {
               ⭳ <span>Export</span>
             </button>
 
-            <button type="button" className="jobs-primary-button">
+            <Link to="/jobs/new" className="jobs-primary-button">
               Add Job +
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -234,9 +218,9 @@ export default function Jobs() {
                       <input type="checkbox" aria-label={`Select ${job.number}`} />
                     </td>
                     <td>
-                      <button type="button" className="jobs-number-link">
+                      <Link to={`/jobs/${job.id}`} className="jobs-number-link">
                         {job.number}
-                      </button>
+                      </Link>
                     </td>
                     <td className="jobs-cell-truncate" title={job.customer}>
                       {job.customer}
