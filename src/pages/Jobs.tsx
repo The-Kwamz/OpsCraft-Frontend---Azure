@@ -1,44 +1,50 @@
 import { Link } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Api } from '../lib/api'
+import type { Job } from '../types'
 
 type JobsTab = 'jobs' | 'projects'
 
-type MockJob = {
-  id: string
-  number: string
-  customer: string
-  location: string
-  assignedTo: string
-  jobType: string
-  start: string
-  status: 'Booked' | 'In Progress' | 'Completed' | 'Cancelled' | 'Overdue'
-  inStatus: number
-  overall: number
-  updatedBy: string
-  updatedDate: string
-  van: string
+function getJobNumber(index: number) {
+  return `JB${String(index + 1).padStart(5, '0')}`
 }
 
-const mockJobs: MockJob[] = [
-  {
-    id: '1',
-    number: 'JB10001',
-    customer: 'Kwame Yinkah',
-    location: '56 Hare Street, Johannesburg',
-    assignedTo: 'Unassigned',
-    jobType: 'Call Out',
-    start: '12 Mar 2026',
-    status: 'Booked',
-    inStatus: 0,
-    overall: 0,
-    updatedBy: 'kwameyinkah@gmail.com',
-    updatedDate: '12 Mar 2026',
-    van: '',
-  },
-]
+function getDisplayStatus(status: Job['status']) {
+  switch (status) {
+    case 'new':
+      return 'Booked'
+    case 'scheduled':
+      return 'Booked'
+    case 'in_progress':
+      return 'In Progress'
+    case 'completed':
+      return 'Completed'
+    default:
+      return 'Booked'
+  }
+}
+
+function getStatusClass(status: Job['status']) {
+  switch (status) {
+    case 'new':
+      return 'status-booked'
+    case 'scheduled':
+      return 'status-booked'
+    case 'in_progress':
+      return 'status-in-progress'
+    case 'completed':
+      return 'status-completed'
+    default:
+      return 'status-booked'
+  }
+}
 
 export default function Jobs() {
   const [activeTab, setActiveTab] = useState<JobsTab>('jobs')
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
   const [searchHere, setSearchHere] = useState('')
   const [tableSearch, setTableSearch] = useState('')
   const [jobStatus, setJobStatus] = useState('')
@@ -47,19 +53,50 @@ export default function Jobs() {
   const [includeClosed, setIncludeClosed] = useState(false)
   const [includeArchived, setIncludeArchived] = useState(false)
 
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const data = await Api.listJobs()
+        setJobs(data)
+      } catch (e: any) {
+        setError(e.message || 'Failed to load jobs')
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [])
+
   const filteredJobs = useMemo(() => {
     const query = tableSearch.trim().toLowerCase()
 
-    if (!query) return mockJobs
+    let results = jobs
 
-    return mockJobs.filter((job) => {
-      return (
-        job.number.toLowerCase().includes(query) ||
-        job.customer.toLowerCase().includes(query) ||
-        job.location.toLowerCase().includes(query)
+    if (query) {
+      results = results.filter((job) => {
+        return (
+          job.customerName.toLowerCase().includes(query) ||
+          job.serviceType.toLowerCase().includes(query) ||
+          job.address.toLowerCase().includes(query)
+        )
+      })
+    }
+
+    if (jobStatus) {
+      results = results.filter((job) => job.status === jobStatus)
+    }
+
+    if (jobType) {
+      results = results.filter((job) =>
+        job.serviceType.toLowerCase().includes(jobType.toLowerCase())
       )
-    })
-  }, [tableSearch])
+    }
+
+    if (!includeClosed) {
+      results = results.filter((job) => job.status !== 'completed')
+    }
+
+    return results
+  }, [jobs, tableSearch, jobStatus, jobType, includeClosed])
 
   return (
     <div className="jobs-page">
@@ -103,6 +140,8 @@ export default function Jobs() {
         </button>
       </div>
 
+      {error && <div className="error">{error}</div>}
+
       <section className="jobs-toolbar-card">
         <div className="jobs-toolbar-row">
           <div className="jobs-toolbar-left">
@@ -127,8 +166,9 @@ export default function Jobs() {
               onChange={(e) => setJobStatus(e.target.value)}
             >
               <option value="">Job Status</option>
-              <option value="booked">Booked</option>
-              <option value="in-progress">In Progress</option>
+              <option value="new">New</option>
+              <option value="scheduled">Scheduled</option>
+              <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
             </select>
 
@@ -138,7 +178,7 @@ export default function Jobs() {
               onChange={(e) => setJobType(e.target.value)}
             >
               <option value="">Job Type</option>
-              <option value="callout">Call Out</option>
+              <option value="call out">Call Out</option>
               <option value="installation">Installation</option>
               <option value="repair">Repair</option>
             </select>
@@ -205,46 +245,52 @@ export default function Jobs() {
             </thead>
 
             <tbody>
-              {filteredJobs.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={13} className="jobs-empty-state">
+                    Loading jobs...
+                  </td>
+                </tr>
+              ) : filteredJobs.length === 0 ? (
                 <tr>
                   <td colSpan={13} className="jobs-empty-state">
                     No jobs found.
                   </td>
                 </tr>
               ) : (
-                filteredJobs.map((job) => (
+                filteredJobs.map((job, index) => (
                   <tr key={job.id}>
                     <td>
-                      <input type="checkbox" aria-label={`Select ${job.number}`} />
+                      <input type="checkbox" aria-label={`Select ${job.id}`} />
                     </td>
                     <td>
                       <Link to={`/jobs/${job.id}`} className="jobs-number-link">
-                        {job.number}
+                        {getJobNumber(index)}
                       </Link>
                     </td>
-                    <td className="jobs-cell-truncate" title={job.customer}>
-                      {job.customer}
+                    <td className="jobs-cell-truncate" title={job.customerName}>
+                      {job.customerName}
                     </td>
-                    <td className="jobs-cell-truncate" title={job.location}>
-                      {job.location}
+                    <td className="jobs-cell-truncate" title={job.address}>
+                      {job.address}
                     </td>
-                    <td className="jobs-cell-truncate" title={job.assignedTo}>
-                      {job.assignedTo}
+                    <td className="jobs-cell-truncate" title="Unassigned">
+                      Unassigned
                     </td>
-                    <td>{job.jobType}</td>
-                    <td>{job.start}</td>
+                    <td>{job.serviceType}</td>
+                    <td>{job.scheduledDate ? new Date(job.scheduledDate).toLocaleDateString() : '-'}</td>
                     <td>
-                      <span className={`jobs-status-pill status-${job.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {job.status}
+                      <span className={`jobs-status-pill ${getStatusClass(job.status)}`}>
+                        {getDisplayStatus(job.status)}
                       </span>
                     </td>
-                    <td className="jobs-numeric-cell">{job.inStatus}</td>
-                    <td className="jobs-numeric-cell">{job.overall}</td>
-                    <td className="jobs-cell-truncate" title={job.updatedBy}>
-                      {job.updatedBy}
+                    <td className="jobs-numeric-cell">0</td>
+                    <td className="jobs-numeric-cell">0</td>
+                    <td className="jobs-cell-truncate" title="System">
+                      System
                     </td>
-                    <td>{job.updatedDate}</td>
-                    <td>{job.van || '-'}</td>
+                    <td>{new Date(job.createdAt).toLocaleDateString()}</td>
+                    <td>-</td>
                   </tr>
                 ))
               )}

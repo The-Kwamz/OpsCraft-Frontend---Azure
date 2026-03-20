@@ -15,6 +15,7 @@ export default function CreateJob() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    console.log('Create Job submit fired')
     setError(null)
 
     if (!customer || !contact || !location || !jobType || !description.trim()) {
