@@ -1,7 +1,8 @@
 export type JobStatus = 'new' | 'scheduled' | 'in_progress' | 'completed'
 
-export interface Job {
+export type Job = {
   id: string
+  solutionId: number
   customerName: string
   serviceType: string
   status: JobStatus

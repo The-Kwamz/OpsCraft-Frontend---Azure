@@ -1,10 +1,9 @@
 import type { Job } from '../types'
 
-// Base URL comes from .env.local / .env.production
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers || {}),
@@ -12,22 +11,38 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   })
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(`API ${res.status} ${res.statusText} – ${text}`)
+  if (!response.ok) {
+    const text = await response.text().catch(() => '')
+    throw new Error(`API ${response.status} ${response.statusText} – ${text}`)
   }
 
-  return res.json() as Promise<T>
+  const contentType = response.headers.get('content-type') || ''
+
+  if (!contentType.includes('application/json')) {
+    const text = await response.text().catch(() => '')
+    throw new Error(`Expected JSON response but received: ${text}`)
+  }
+
+  return response.json() as Promise<T>
 }
 
 export const Api = {
   listJobs: () => request<Job[]>('/jobs'),
-
-  getJob: (id: string) => request<Job>(`/jobs/${id}`),
 
   createJob: (payload: Partial<Job>) =>
     request<Job>('/jobs', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+
+  getJob: async (id: string) => {
+    const jobs = await request<Job[]>('/jobs')
+    const job = jobs.find((item) => item.id === id)
+
+    if (!job) {
+      throw new Error('Job not found')
+    }
+
+    return job
+  },
 }

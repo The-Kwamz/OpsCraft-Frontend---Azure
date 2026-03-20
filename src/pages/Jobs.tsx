@@ -5,22 +5,18 @@ import type { Job } from '../types'
 
 type JobsTab = 'jobs' | 'projects'
 
-function getJobNumber(index: number) {
-  return `JB${String(index + 1).padStart(5, '0')}`
-}
-
-function getDisplayStatus(status: Job['status']) {
+function formatJobStatus(status: Job['status']) {
   switch (status) {
     case 'new':
       return 'Booked'
     case 'scheduled':
-      return 'Booked'
+      return 'Scheduled'
     case 'in_progress':
       return 'In Progress'
     case 'completed':
       return 'Completed'
     default:
-      return 'Booked'
+      return status
   }
 }
 
@@ -41,10 +37,6 @@ function getStatusClass(status: Job['status']) {
 
 export default function Jobs() {
   const [activeTab, setActiveTab] = useState<JobsTab>('jobs')
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
   const [searchHere, setSearchHere] = useState('')
   const [tableSearch, setTableSearch] = useState('')
   const [jobStatus, setJobStatus] = useState('')
@@ -52,50 +44,57 @@ export default function Jobs() {
   const [dateRange, setDateRange] = useState('')
   const [includeClosed, setIncludeClosed] = useState(false)
   const [includeArchived, setIncludeArchived] = useState(false)
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    ;(async () => {
+    async function loadJobs() {
       try {
+        setLoading(true)
+        setError(null)
         const data = await Api.listJobs()
         setJobs(data)
       } catch (e: any) {
-        setError(e.message || 'Failed to load jobs')
+        setError(e.message || 'Failed to fetch')
       } finally {
         setLoading(false)
       }
-    })()
+    }
+
+    loadJobs()
   }, [])
 
   const filteredJobs = useMemo(() => {
+    let result = [...jobs]
+
     const query = tableSearch.trim().toLowerCase()
-
-    let results = jobs
-
     if (query) {
-      results = results.filter((job) => {
+      result = result.filter((job) => {
+        const jobNumber = `jb${String(job.solutionId).padStart(5, '0')}`
         return (
+          jobNumber.includes(query) ||
           job.customerName.toLowerCase().includes(query) ||
+          job.address.toLowerCase().includes(query) ||
           job.serviceType.toLowerCase().includes(query) ||
-          job.address.toLowerCase().includes(query)
+          job.notes.toLowerCase().includes(query)
         )
       })
     }
 
     if (jobStatus) {
-      results = results.filter((job) => job.status === jobStatus)
+      result = result.filter((job) => job.status === jobStatus)
     }
 
     if (jobType) {
-      results = results.filter((job) =>
-        job.serviceType.toLowerCase().includes(jobType.toLowerCase())
-      )
+      result = result.filter((job) => job.serviceType === jobType)
     }
 
     if (!includeClosed) {
-      results = results.filter((job) => job.status !== 'completed')
+      result = result.filter((job) => job.status !== 'completed')
     }
 
-    return results
+    return result
   }, [jobs, tableSearch, jobStatus, jobType, includeClosed])
 
   return (
@@ -115,7 +114,7 @@ export default function Jobs() {
             />
           </div>
 
-          <button type="button" className="jobs-user-button" aria-label="User menu">
+          <button type="button" className="jobs-user-button" aria-label="Search Job">
             <span className="jobs-avatar">SJ</span>
             <span className="jobs-user-name">Search Job</span>
           </button>
@@ -166,7 +165,7 @@ export default function Jobs() {
               onChange={(e) => setJobStatus(e.target.value)}
             >
               <option value="">Job Status</option>
-              <option value="new">New</option>
+              <option value="new">Booked</option>
               <option value="scheduled">Scheduled</option>
               <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
@@ -178,9 +177,9 @@ export default function Jobs() {
               onChange={(e) => setJobType(e.target.value)}
             >
               <option value="">Job Type</option>
-              <option value="call out">Call Out</option>
-              <option value="installation">Installation</option>
-              <option value="repair">Repair</option>
+              <option value="Call Out">Call Out</option>
+              <option value="Installation">Installation</option>
+              <option value="Maintenance">Maintenance</option>
             </select>
 
             <input
@@ -236,61 +235,53 @@ export default function Jobs() {
                 <th>Job Type</th>
                 <th>Start</th>
                 <th>Status</th>
-                <th>In Status</th>
-                <th>Overall</th>
-                <th>Updated By</th>
                 <th>Updated Date</th>
-                <th>Van</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={13} className="jobs-empty-state">
+                  <td colSpan={9} className="jobs-empty-state">
                     Loading jobs...
                   </td>
                 </tr>
               ) : filteredJobs.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="jobs-empty-state">
+                  <td colSpan={9} className="jobs-empty-state">
                     No jobs found.
                   </td>
                 </tr>
               ) : (
-                filteredJobs.map((job, index) => (
+                filteredJobs.map((job) => (
                   <tr key={job.id}>
                     <td>
-                      <input type="checkbox" aria-label={`Select ${job.id}`} />
+                      <input type="checkbox" aria-label={`Select job ${job.solutionId}`} />
                     </td>
                     <td>
                       <Link to={`/jobs/${job.id}`} className="jobs-number-link">
-                        {getJobNumber(index)}
+                        {`JB${String(job.solutionId).padStart(5, '0')}`}
                       </Link>
                     </td>
                     <td className="jobs-cell-truncate" title={job.customerName}>
                       {job.customerName}
                     </td>
                     <td className="jobs-cell-truncate" title={job.address}>
-                      {job.address}
+                      {job.address || '-'}
                     </td>
-                    <td className="jobs-cell-truncate" title="Unassigned">
-                      Unassigned
-                    </td>
+                    <td>Unassigned</td>
                     <td>{job.serviceType}</td>
-                    <td>{job.scheduledDate ? new Date(job.scheduledDate).toLocaleDateString() : '-'}</td>
+                    <td>
+                      {job.scheduledDate
+                        ? new Date(job.scheduledDate).toLocaleDateString()
+                        : '-'}
+                    </td>
                     <td>
                       <span className={`jobs-status-pill ${getStatusClass(job.status)}`}>
-                        {getDisplayStatus(job.status)}
+                        {formatJobStatus(job.status)}
                       </span>
                     </td>
-                    <td className="jobs-numeric-cell">0</td>
-                    <td className="jobs-numeric-cell">0</td>
-                    <td className="jobs-cell-truncate" title="System">
-                      System
-                    </td>
                     <td>{new Date(job.createdAt).toLocaleDateString()}</td>
-                    <td>-</td>
                   </tr>
                 ))
               )}
@@ -303,7 +294,9 @@ export default function Jobs() {
             <button type="button" className="jobs-icon-button" aria-label="Refresh">
               ↻
             </button>
-            <span>1–{filteredJobs.length} of {filteredJobs.length}</span>
+            <span>
+              {loading ? '0' : `1–${filteredJobs.length}`} of {filteredJobs.length}
+            </span>
           </div>
 
           <div className="jobs-pagination-right">
