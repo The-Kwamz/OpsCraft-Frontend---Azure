@@ -181,57 +181,59 @@ export default function Dashboard() {
   const maxTrendValue = Math.max(...jobsByDay.map((item) => item.value), 1);
 
   const recentJobs = mockJobs.slice(0, 5);
-  const urgentInvoices = mockInvoices.filter((invoice) => invoice.status === "overdue" || invoice.status === "draft");
+  const urgentInvoices = mockInvoices.filter(
+    (invoice) => invoice.status === "overdue" || invoice.status === "draft"
+  );
 
   return (
     <div className="jobs-page">
-      <div className="jobs-topbar">
+      <div className="jobs-topbar" style={{ marginBottom: 8 }}>
         <div className="jobs-topbar-left">
-          <h1 className="jobs-page-title">Dashboard</h1>
+          <h1 className="jobs-page-title" style={{ marginBottom: 0 }}>Dashboard</h1>
         </div>
       </div>
 
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(4, minmax(180px, 1fr))",
-          gap: 20,
-          marginBottom: 24,
+          gridTemplateColumns: "repeat(4, minmax(140px, 1fr))",
+          gap: 12,
+          marginBottom: 14,
         }}
       >
-        <div className="jobs-toolbar-card">
-          <div style={{ color: "#6b7280", fontSize: 14, marginBottom: 8 }}>Active Jobs</div>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{metrics.activeJobs}</div>
+        <div className="jobs-toolbar-card" style={{ padding: 16 }}>
+          <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>Active Jobs</div>
+          <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.1 }}>{metrics.activeJobs}</div>
         </div>
 
-        <div className="jobs-toolbar-card">
-          <div style={{ color: "#6b7280", fontSize: 14, marginBottom: 8 }}>Scheduled Today</div>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{metrics.scheduledToday}</div>
+        <div className="jobs-toolbar-card" style={{ padding: 16 }}>
+          <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>Scheduled Today</div>
+          <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.1 }}>{metrics.scheduledToday}</div>
         </div>
 
-        <div className="jobs-toolbar-card">
-          <div style={{ color: "#6b7280", fontSize: 14, marginBottom: 8 }}>Quotes Pending</div>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{metrics.pendingQuotes}</div>
+        <div className="jobs-toolbar-card" style={{ padding: 16 }}>
+          <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>Quotes Pending</div>
+          <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.1 }}>{metrics.pendingQuotes}</div>
         </div>
 
-        <div className="jobs-toolbar-card">
-          <div style={{ color: "#6b7280", fontSize: 14, marginBottom: 8 }}>Overdue Invoices</div>
-          <div style={{ fontSize: 32, fontWeight: 800 }}>{metrics.overdueInvoices}</div>
+        <div className="jobs-toolbar-card" style={{ padding: 16 }}>
+          <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>Overdue Invoices</div>
+          <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.1 }}>{metrics.overdueInvoices}</div>
         </div>
       </section>
 
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 1fr",
-          gap: 24,
-          marginBottom: 24,
+          gridTemplateColumns: "1.15fr 1fr",
+          gap: 14,
+          marginBottom: 14,
         }}
       >
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 20 }}>Jobs by Status</h2>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 14, fontSize: 22 }}>Jobs by Status</h2>
 
-          <div style={{ display: "grid", gap: 18 }}>
+          <div style={{ display: "grid", gap: 12 }}>
             {[
               { label: "Booked", value: jobStatusCounts.new, color: "#2563eb" },
               { label: "Scheduled", value: jobStatusCounts.scheduled, color: "#7c3aed" },
@@ -243,8 +245,8 @@ export default function Dashboard() {
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
-                    marginBottom: 8,
-                    fontSize: 14,
+                    marginBottom: 6,
+                    fontSize: 13,
                     fontWeight: 600,
                   }}
                 >
@@ -254,7 +256,7 @@ export default function Dashboard() {
                 <div
                   style={{
                     width: "100%",
-                    height: 12,
+                    height: 10,
                     background: "#e5e7eb",
                     borderRadius: 999,
                     overflow: "hidden",
@@ -274,15 +276,15 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 20 }}>Jobs Created This Week</h2>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 14, fontSize: 22 }}>Jobs This Week</h2>
 
           <div
             style={{
               display: "flex",
               alignItems: "end",
-              gap: 14,
-              minHeight: 220,
+              gap: 10,
+              minHeight: 165,
             }}
           >
             {jobsByDay.map((item) => (
@@ -294,22 +296,22 @@ export default function Dashboard() {
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "end",
-                  gap: 10,
+                  gap: 6,
                 }}
               >
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{item.value}</div>
+                <div style={{ fontSize: 12, fontWeight: 600 }}>{item.value}</div>
                 <div
                   style={{
                     width: "100%",
-                    maxWidth: 44,
-                    height: `${(item.value / maxTrendValue) * 160}px`,
-                    minHeight: 20,
+                    maxWidth: 34,
+                    height: `${(item.value / maxTrendValue) * 110}px`,
+                    minHeight: 14,
                     background: item.color,
-                    borderRadius: 12,
-                    boxShadow: `0 8px 18px ${item.color}22`,
+                    borderRadius: 10,
+                    boxShadow: `0 6px 12px ${item.color}22`,
                   }}
                 />
-                <div style={{ fontSize: 13, color: "#6b7280" }}>{item.label}</div>
+                <div style={{ fontSize: 11, color: "#6b7280" }}>{item.label}</div>
               </div>
             ))}
           </div>
@@ -319,22 +321,13 @@ export default function Dashboard() {
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "1.2fr 1fr",
-          gap: 24,
-          marginBottom: 24,
+          gridTemplateColumns: "1.15fr 1fr",
+          gap: 14,
+          marginBottom: 14,
         }}
       >
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-            }}
-          >
-            <h2 style={{ margin: 0 }}>Today&apos;s Schedule</h2>
-          </div>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>Today&apos;s Schedule</h2>
 
           <div className="jobs-table-wrap">
             <table className="jobs-table">
@@ -362,48 +355,54 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>Attention Items</h2>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>Attention Items</h2>
 
-          <div style={{ display: "grid", gap: 14 }}>
+          <div style={{ display: "grid", gap: 10 }}>
             <div
               style={{
-                padding: 16,
-                borderRadius: 14,
+                padding: 12,
+                borderRadius: 12,
                 background: "#eff6ff",
                 border: "1px solid #bfdbfe",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6, color: "#1d4ed8" }}>Overdue Invoices</div>
-              <div style={{ color: "#475569" }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: "#1d4ed8", fontSize: 14 }}>
+                Overdue Invoices
+              </div>
+              <div style={{ color: "#475569", fontSize: 13 }}>
                 {metrics.overdueInvoices} invoices need follow-up from finance.
               </div>
             </div>
 
             <div
               style={{
-                padding: 16,
-                borderRadius: 14,
+                padding: 12,
+                borderRadius: 12,
                 background: "#fff7ed",
                 border: "1px solid #fdba74",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6, color: "#c2410c" }}>Unassigned Jobs</div>
-              <div style={{ color: "#475569" }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: "#c2410c", fontSize: 14 }}>
+                Unassigned Jobs
+              </div>
+              <div style={{ color: "#475569", fontSize: 13 }}>
                 2 jobs still need technicians assigned before dispatch.
               </div>
             </div>
 
             <div
               style={{
-                padding: 16,
-                borderRadius: 14,
+                padding: 12,
+                borderRadius: 12,
                 background: "#f0fdf4",
                 border: "1px solid #86efac",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6, color: "#15803d" }}>Pending Quotes</div>
-              <div style={{ color: "#475569" }}>
+              <div style={{ fontWeight: 700, marginBottom: 4, color: "#15803d", fontSize: 14 }}>
+                Pending Quotes
+              </div>
+              <div style={{ color: "#475569", fontSize: 13 }}>
                 6 quotes are awaiting approval or client response.
               </div>
             </div>
@@ -415,11 +414,11 @@ export default function Dashboard() {
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
-          gap: 24,
+          gap: 14,
         }}
       >
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>Recent Jobs</h2>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>Recent Jobs</h2>
 
           <div className="jobs-table-wrap">
             <table className="jobs-table">
@@ -449,8 +448,8 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="jobs-table-card" style={{ padding: 24 }}>
-          <h2 style={{ marginTop: 0, marginBottom: 16 }}>Invoice Watchlist</h2>
+        <div className="jobs-table-card" style={{ padding: 16 }}>
+          <h2 style={{ marginTop: 0, marginBottom: 12, fontSize: 22 }}>Invoice Watchlist</h2>
 
           <div className="jobs-table-wrap">
             <table className="jobs-table">
