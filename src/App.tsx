@@ -1,7 +1,35 @@
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import Jobs from "./pages/Jobs";
 import JobDetails from "./pages/JobDetails";
 import CreateJob from "./pages/CreateJob";
+import Dashboard from "./pages/Dashboard";
+import Schedule from "./pages/Schedule";
+import Customers from "./pages/Customers";
+import Quotes from "./pages/Quotes";
+import Invoices from "./pages/Invoices";
+
+function TopNavLink({
+  to,
+  label,
+}: {
+  to: string;
+  label: string;
+}) {
+  const location = useLocation();
+  const isActive =
+    to === "/"
+      ? location.pathname === "/"
+      : location.pathname === to || location.pathname.startsWith(`${to}/`);
+
+  return (
+    <Link
+      to={to}
+      className={isActive ? "top-nav-item top-nav-item--active" : "top-nav-item"}
+    >
+      {label}
+    </Link>
+  );
+}
 
 export default function App() {
   return (
@@ -11,29 +39,12 @@ export default function App() {
 
         <div className="topbar-main">
           <nav className="top-nav">
-            <button type="button" className="top-nav-item">
-              Dashboard
-            </button>
-
-            <button type="button" className="top-nav-item">
-              Schedule
-            </button>
-
-            <button type="button" className="top-nav-item">
-              Customers
-            </button>
-
-            <button type="button" className="top-nav-item">
-              Quotes
-            </button>
-
-            <button type="button" className="top-nav-item">
-              Invoices
-            </button>
-
-            <Link to="/" className="top-nav-item top-nav-item--active">
-              Jobs
-            </Link>
+            <TopNavLink to="/dashboard" label="Dashboard" />
+            <TopNavLink to="/schedule" label="Schedule" />
+            <TopNavLink to="/customers" label="Customers" />
+            <TopNavLink to="/quotes" label="Quotes" />
+            <TopNavLink to="/invoices" label="Invoices" />
+            <TopNavLink to="/" label="Jobs" />
           </nav>
 
           <div className="topbar-user">
@@ -51,6 +62,11 @@ export default function App() {
       <main className="container">
         <Routes>
           <Route path="/" element={<Jobs />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/schedule" element={<Schedule />} />
+          <Route path="/customers" element={<Customers />} />
+          <Route path="/quotes" element={<Quotes />} />
+          <Route path="/invoices" element={<Invoices />} />
           <Route path="/jobs/new" element={<CreateJob />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
           <Route path="*" element={<Navigate to="/" replace />} />
