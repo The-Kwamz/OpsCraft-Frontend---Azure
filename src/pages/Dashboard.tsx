@@ -77,13 +77,13 @@ const mockInvoices: DashboardInvoice[] = [
 ];
 
 const jobsByDay = [
-  { label: "Mon", value: 2 },
-  { label: "Tue", value: 4 },
-  { label: "Wed", value: 3 },
-  { label: "Thu", value: 5 },
-  { label: "Fri", value: 4 },
-  { label: "Sat", value: 1 },
-  { label: "Sun", value: 2 },
+  { label: "Mon", value: 2, color: "#2563eb" },
+  { label: "Tue", value: 4, color: "#7c3aed" },
+  { label: "Wed", value: 3, color: "#0891b2" },
+  { label: "Thu", value: 5, color: "#16a34a" },
+  { label: "Fri", value: 4, color: "#ea580c" },
+  { label: "Sat", value: 1, color: "#dc2626" },
+  { label: "Sun", value: 2, color: "#9333ea" },
 ];
 
 function formatJobStatus(status: JobStatus) {
@@ -233,10 +233,10 @@ export default function Dashboard() {
 
           <div style={{ display: "grid", gap: 18 }}>
             {[
-              { label: "Booked", value: jobStatusCounts.new, className: "status-booked" },
-              { label: "Scheduled", value: jobStatusCounts.scheduled, className: "status-booked" },
-              { label: "In Progress", value: jobStatusCounts.in_progress, className: "status-in-progress" },
-              { label: "Completed", value: jobStatusCounts.completed, className: "status-completed" },
+              { label: "Booked", value: jobStatusCounts.new, color: "#2563eb" },
+              { label: "Scheduled", value: jobStatusCounts.scheduled, color: "#7c3aed" },
+              { label: "In Progress", value: jobStatusCounts.in_progress, color: "#f59e0b" },
+              { label: "Completed", value: jobStatusCounts.completed, color: "#16a34a" },
             ].map((item) => (
               <div key={item.label}>
                 <div
@@ -261,11 +261,11 @@ export default function Dashboard() {
                   }}
                 >
                   <div
-                    className={item.className}
                     style={{
                       height: "100%",
                       width: `${(item.value / maxStatusCount) * 100}%`,
                       borderRadius: 999,
+                      background: item.color,
                     }}
                   />
                 </div>
@@ -304,8 +304,9 @@ export default function Dashboard() {
                     maxWidth: 44,
                     height: `${(item.value / maxTrendValue) * 160}px`,
                     minHeight: 20,
-                    background: "#111827",
+                    background: item.color,
                     borderRadius: 12,
+                    boxShadow: `0 8px 18px ${item.color}22`,
                   }}
                 />
                 <div style={{ fontSize: 13, color: "#6b7280" }}>{item.label}</div>
@@ -369,12 +370,12 @@ export default function Dashboard() {
               style={{
                 padding: 16,
                 borderRadius: 14,
-                background: "#f9fafb",
-                border: "1px solid #e5e7eb",
+                background: "#eff6ff",
+                border: "1px solid #bfdbfe",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Overdue Invoices</div>
-              <div style={{ color: "#6b7280" }}>
+              <div style={{ fontWeight: 700, marginBottom: 6, color: "#1d4ed8" }}>Overdue Invoices</div>
+              <div style={{ color: "#475569" }}>
                 {metrics.overdueInvoices} invoices need follow-up from finance.
               </div>
             </div>
@@ -383,12 +384,12 @@ export default function Dashboard() {
               style={{
                 padding: 16,
                 borderRadius: 14,
-                background: "#f9fafb",
-                border: "1px solid #e5e7eb",
+                background: "#fff7ed",
+                border: "1px solid #fdba74",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Unassigned Jobs</div>
-              <div style={{ color: "#6b7280" }}>
+              <div style={{ fontWeight: 700, marginBottom: 6, color: "#c2410c" }}>Unassigned Jobs</div>
+              <div style={{ color: "#475569" }}>
                 2 jobs still need technicians assigned before dispatch.
               </div>
             </div>
@@ -397,12 +398,12 @@ export default function Dashboard() {
               style={{
                 padding: 16,
                 borderRadius: 14,
-                background: "#f9fafb",
-                border: "1px solid #e5e7eb",
+                background: "#f0fdf4",
+                border: "1px solid #86efac",
               }}
             >
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Pending Quotes</div>
-              <div style={{ color: "#6b7280" }}>
+              <div style={{ fontWeight: 700, marginBottom: 6, color: "#15803d" }}>Pending Quotes</div>
+              <div style={{ color: "#475569" }}>
                 6 quotes are awaiting approval or client response.
               </div>
             </div>
