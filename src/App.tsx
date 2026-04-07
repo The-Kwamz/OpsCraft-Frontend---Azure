@@ -7,6 +7,7 @@ import Schedule from "./pages/Schedule";
 import Customers from "./pages/Customers";
 import Quotes from "./pages/Quotes";
 import Invoices from "./pages/Invoices";
+import opsCloudLogo from "./assets/opscloud-logo.png";
 
 function TopNavLink({
   to,
@@ -31,13 +32,58 @@ function TopNavLink({
   );
 }
 
+function Brand() {
+  return (
+    <Link
+      to="/dashboard"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        textDecoration: "none",
+        minWidth: "fit-content",
+        lineHeight: 1,
+        height: 64,
+      }}
+    >
+      <img
+        src={opsCloudLogo}
+        alt="OpsCloud logo"
+        style={{
+          width: 190,
+          height: 64,
+          objectFit: "contain",
+          display: "block",
+        }}
+      />
+    </Link>
+  );
+}
+
 export default function App() {
   return (
     <div className="app">
-      <header className="topbar topbar--nav">
-        <div className="brand">OpsCraft</div>
+      <header
+        className="topbar topbar--nav"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 20,
+          paddingTop: 12,
+          paddingBottom: 12,
+        }}
+      >
+        <Brand />
 
-        <div className="topbar-main">
+        <div
+          className="topbar-main"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
           <nav className="top-nav">
             <TopNavLink to="/dashboard" label="Dashboard" />
             <TopNavLink to="/schedule" label="Schedule" />
@@ -69,12 +115,12 @@ export default function App() {
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/jobs/new" element={<CreateJob />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </main>
 
       <footer className="footer">
-        © {new Date().getFullYear()} OpsCraft MVP
+        © {new Date().getFullYear()} OpsCloud MVP
       </footer>
     </div>
   );
