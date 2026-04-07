@@ -51,7 +51,7 @@ function Brand() {
         alt="OpsCloud logo"
         style={{
           width: 190,
-          height: 64,
+          height: 150,
           objectFit: "contain",
           display: "block",
         }}
