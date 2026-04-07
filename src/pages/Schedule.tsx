@@ -5,6 +5,7 @@ type AppointmentStatus = "scheduled" | "in_progress" | "completed";
 
 type Appointment = {
   id: string;
+  jobId: string;
   title: string;
   technician: string;
   customer: string;
@@ -18,6 +19,7 @@ type Appointment = {
 const appointments: Appointment[] = [
   {
     id: "1",
+    jobId: "1",
     title: "Electrical Inspection",
     technician: "BN 2-14",
     customer: "Vodacom",
@@ -29,6 +31,7 @@ const appointments: Appointment[] = [
   },
   {
     id: "2",
+    jobId: "2",
     title: "Installation Visit",
     technician: "BN 2-14",
     customer: "Kwame Test",
@@ -40,6 +43,7 @@ const appointments: Appointment[] = [
   },
   {
     id: "3",
+    jobId: "3",
     title: "Maintenance Review",
     technician: "BN 2-14",
     customer: "Makhoba Projects",
@@ -51,6 +55,7 @@ const appointments: Appointment[] = [
   },
   {
     id: "4",
+    jobId: "4",
     title: "Site Call Out",
     technician: "Team Alpha",
     customer: "Blue Rock Estates",
@@ -62,25 +67,11 @@ const appointments: Appointment[] = [
   },
 ];
 
-const timeSlots = [11, 12, 13, 14, 15, 16];
-
+const timeSlots = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 const TECH_OPTIONS = ["BN 2-14", "Team Alpha", "All Technicians"];
 
 function formatHour(hour: number) {
-  return `${hour}:00`;
-}
-
-function getStatusLabel(status: AppointmentStatus) {
-  switch (status) {
-    case "scheduled":
-      return "Scheduled";
-    case "in_progress":
-      return "In Progress";
-    case "completed":
-      return "Completed";
-    default:
-      return status;
-  }
+  return `${String(hour).padStart(2, "0")}:00`;
 }
 
 function formatDayLabel(date: Date) {
@@ -95,16 +86,12 @@ function formatMonthLabel(date: Date) {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "long" });
 }
 
-function formatWeekRange(startDate: Date) {
-  const endDate = new Date(startDate);
-  endDate.setDate(startDate.getDate() + 4);
-
-  const month = startDate.toLocaleDateString("en-US", { month: "long" });
-  const startDay = startDate.toLocaleDateString("en-US", { day: "2-digit" });
-  const endDay = endDate.toLocaleDateString("en-US", { day: "2-digit" });
-  const year = startDate.getFullYear();
-
-  return `${year}, ${month} ${startDay}–${endDay}`;
+function formatHeaderDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
 }
 
 function toDateKey(date: Date) {
@@ -120,7 +107,9 @@ function startOfWorkWeek(date: Date) {
   return copy;
 }
 
-function buildWorkWeek(startDate: Date) {
+function buildWorkWeek(selectedDate: Date) {
+  const startDate = startOfWorkWeek(selectedDate);
+
   return Array.from({ length: 5 }, (_, index) => {
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + index);
@@ -139,18 +128,37 @@ function buildMiniCalendarDays() {
     "5", "6", "7", "8", "9", "10", "11",
     "12", "13", "14", "15", "16", "17", "18",
     "19", "20", "21", "22", "23", "24", "25",
+    "26", "27", "28", "29", "30", "1", "2",
   ];
+}
+
+function getStatusLabel(status: AppointmentStatus) {
+  switch (status) {
+    case "scheduled":
+      return "Scheduled";
+    case "in_progress":
+      return "In Progress";
+    case "completed":
+      return "Completed";
+    default:
+      return status;
+  }
 }
 
 export default function Schedule() {
   const navigate = useNavigate();
 
   const today = new Date("2026-04-07T09:00:00");
-  const [weekStart, setWeekStart] = useState(startOfWorkWeek(today));
   const [selectedDate, setSelectedDate] = useState("2026-04-07");
   const [selectedTech, setSelectedTech] = useState("BN 2-14");
 
-  const weekDays = useMemo(() => buildWorkWeek(weekStart), [weekStart]);
+  const selectedDateObject = useMemo(() => {
+    return new Date(`${selectedDate}T09:00:00`);
+  }, [selectedDate]);
+
+  const weekDays = useMemo(() => {
+    return buildWorkWeek(selectedDateObject);
+  }, [selectedDateObject]);
 
   const filteredAppointments = useMemo(() => {
     if (selectedTech === "All Technicians") {
@@ -165,32 +173,43 @@ export default function Schedule() {
   }, [filteredAppointments, selectedDate]);
 
   function goToToday() {
-    const newStart = startOfWorkWeek(today);
-    setWeekStart(newStart);
     setSelectedDate(toDateKey(today));
   }
 
-  function goToPreviousWeek() {
-    const next = new Date(weekStart);
-    next.setDate(next.getDate() - 7);
-    setWeekStart(next);
-    setSelectedDate(toDateKey(next));
+  function goToPreviousDay() {
+    const previous = new Date(selectedDateObject);
+    previous.setDate(previous.getDate() - 1);
+    setSelectedDate(toDateKey(previous));
   }
 
-  function goToNextWeek() {
-    const next = new Date(weekStart);
-    next.setDate(next.getDate() + 7);
-    setWeekStart(next);
+  function goToNextDay() {
+    const next = new Date(selectedDateObject);
+    next.setDate(next.getDate() + 1);
     setSelectedDate(toDateKey(next));
   }
 
   function handleMiniCalendarSelect(day: string) {
     const numericDay = Number(day);
+
     if (numericDay >= 1 && numericDay <= 30) {
       const selected = new Date(2026, 3, numericDay);
       setSelectedDate(toDateKey(selected));
-      setWeekStart(startOfWorkWeek(selected));
     }
+  }
+
+  function openCreateJob(date: string, hour?: number) {
+    const params = new URLSearchParams();
+    params.set("date", date);
+
+    if (typeof hour === "number") {
+      params.set("time", formatHour(hour));
+    }
+
+    navigate(`/jobs/new?${params.toString()}`);
+  }
+
+  function openJob(jobId: string) {
+    navigate(`/jobs/${jobId}`);
   }
 
   return (
@@ -238,7 +257,7 @@ export default function Schedule() {
                 color: "#374151",
               }}
             >
-              <span>{formatMonthLabel(new Date(selectedDate))}</span>
+              <span>{formatMonthLabel(selectedDateObject)}</span>
               <span style={{ color: "#6b7280" }}>↑ ↓</span>
             </div>
 
@@ -268,7 +287,7 @@ export default function Schedule() {
               }}
             >
               {buildMiniCalendarDays().map((item) => {
-                const isSelected = Number(item) === new Date(selectedDate).getDate();
+                const isSelected = Number(item) === selectedDateObject.getDate();
 
                 return (
                   <button
@@ -419,7 +438,7 @@ export default function Schedule() {
                 <div style={{ display: "flex", gap: 8 }}>
                   <button
                     type="button"
-                    onClick={goToPreviousWeek}
+                    onClick={goToPreviousDay}
                     style={{
                       border: "1px solid #d1d5db",
                       background: "#fff",
@@ -432,7 +451,7 @@ export default function Schedule() {
                   </button>
                   <button
                     type="button"
-                    onClick={goToNextWeek}
+                    onClick={goToNextDay}
                     style={{
                       border: "1px solid #d1d5db",
                       background: "#fff",
@@ -452,7 +471,7 @@ export default function Schedule() {
                     color: "#1f2937",
                   }}
                 >
-                  {formatWeekRange(weekStart)}
+                  {formatHeaderDate(selectedDateObject)}
                 </div>
               </div>
 
@@ -482,7 +501,7 @@ export default function Schedule() {
 
                 <button
                   type="button"
-                  onClick={() => navigate("/jobs/new")}
+                  onClick={() => openCreateJob(selectedDate)}
                   style={{
                     background: "#4f46e5",
                     color: "#fff",
@@ -573,13 +592,19 @@ export default function Schedule() {
                   </button>
 
                   {timeSlots.map((hour) => (
-                    <div
+                    <button
                       key={`${day.key}-${hour}`}
+                      type="button"
+                      onClick={() => openCreateJob(day.key, hour)}
                       style={{
+                        width: "100%",
                         height: 95,
+                        border: "none",
                         borderBottom: "1px solid #edf0f3",
                         background: selectedDate === day.key ? "rgba(91,91,214,0.04)" : "#fff",
+                        cursor: "pointer",
                       }}
+                      aria-label={`Book job on ${day.key} at ${formatHour(hour)}`}
                     />
                   ))}
 
@@ -593,7 +618,7 @@ export default function Schedule() {
                         <button
                           key={item.id}
                           type="button"
-                          onClick={() => navigate("/jobs")}
+                          onClick={() => openJob(item.jobId)}
                           style={{
                             position: "absolute",
                             left: 8,
@@ -679,7 +704,7 @@ export default function Schedule() {
                       </div>
                       <button
                         type="button"
-                        onClick={() => navigate("/jobs")}
+                        onClick={() => openJob(item.jobId)}
                         style={{
                           border: "1px solid #d1d5db",
                           background: "#fff",
