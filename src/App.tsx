@@ -5,6 +5,7 @@ import CreateJob from "./pages/CreateJob";
 import Dashboard from "./pages/Dashboard";
 import Schedule from "./pages/Schedule";
 import Customers from "./pages/Customers";
+import CreateCustomer from "./pages/CreateCustomer";
 import Quotes from "./pages/Quotes";
 import Invoices from "./pages/Invoices";
 import opsCloudLogo from "./assets/opscloud-logo.png";
@@ -51,7 +52,7 @@ function Brand() {
         alt="OpsCloud logo"
         style={{
           width: 190,
-          height: 150,
+          height: 190,
           objectFit: "contain",
           display: "block",
         }}
@@ -94,11 +95,19 @@ export default function App() {
           </nav>
 
           <div className="topbar-user">
-            <Link to="/notifications" className="topbar-user-icon" aria-label="Notifications">
+            <Link
+              to="/notifications"
+              className="topbar-user-icon"
+              aria-label="Notifications"
+            >
               🔔
             </Link>
 
-            <Link to="/profile" className="topbar-user-icon" aria-label="Profile">
+            <Link
+              to="/profile"
+              className="topbar-user-icon"
+              aria-label="Profile"
+            >
               👤
             </Link>
           </div>
@@ -111,6 +120,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/new" element={<CreateCustomer />} />
           <Route path="/quotes" element={<Quotes />} />
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/jobs/new" element={<CreateJob />} />

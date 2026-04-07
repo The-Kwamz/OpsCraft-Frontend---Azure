@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useMemo, useState } from "react";
 
 type CustomerStatus = "active" | "inactive";
@@ -16,7 +17,7 @@ const mockCustomers: Customer[] = [
   {
     id: "1",
     name: "Kwame Test",
-    company: "OpsCraft Demo",
+    company: "OpsCloud Demo",
     email: "kwame@test.com",
     phone: "071 000 0001",
     city: "Pretoria",
@@ -53,6 +54,10 @@ const mockCustomers: Customer[] = [
 
 function getStatusLabel(status: CustomerStatus) {
   return status === "active" ? "Active" : "Inactive";
+}
+
+function getStatusClass(status: CustomerStatus) {
+  return status === "active" ? "status-completed" : "status-booked";
 }
 
 export default function Customers() {
@@ -112,9 +117,9 @@ export default function Customers() {
           </div>
 
           <div className="jobs-toolbar-right">
-            <button type="button" className="jobs-primary-button">
+            <Link to="/customers/new" className="jobs-primary-button">
               Add Customer +
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -149,7 +154,7 @@ export default function Customers() {
                     <td>{customer.phone}</td>
                     <td>{customer.city}</td>
                     <td>
-                      <span className="jobs-status-pill status-booked">
+                      <span className={`jobs-status-pill ${getStatusClass(customer.status)}`}>
                         {getStatusLabel(customer.status)}
                       </span>
                     </td>
